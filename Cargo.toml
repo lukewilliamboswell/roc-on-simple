@@ -1,0 +1,8 @@
+[package]
+name = "roc-on-simple"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+midly = "0.5.3"
+roc_std = { git = "https://github.com/roc-lang/roc.git" }
