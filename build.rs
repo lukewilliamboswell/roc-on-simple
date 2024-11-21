@@ -19,7 +19,7 @@ fn main() {
     let target = RocOnSupportedTarget::default();
 
     // Find required static libraries in the build cache or root directory
-    println!("cargo:rustc-link-search={}", out_dir.display());
+    println!("cargo:rustc-link-search=native={}", out_dir.display());
 
     // Get the roc app object file (ensure it exists)
     let app = get_roc_app_object(&target);
@@ -78,9 +78,6 @@ fn main() {
             // Copy the app dylib to the build cache
             let out_path = out_dir.join("libapp.so");
             std::fs::copy(app_so, out_path).unwrap();
-
-            // Add linking flags to make sure our symbols are visible to roc
-            println!("cargo:rustc-link-arg=-Wl,-export_dynamic");
 
             // Link with the app object file
             println!("cargo:rustc-link-lib=dylib=app");
