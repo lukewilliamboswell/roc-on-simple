@@ -3,7 +3,7 @@ platform ""
     exposes []
     packages {}
     imports []
-    provides [mainForHost]
+    provides [mainForHost!]
 
 FpsTiming : [Fps24, Fps25, Fps29, Fps30]
 Format : [SingleTrack, Parallel, Sequential]
@@ -15,31 +15,38 @@ Header : {
 }
 
 MidiMessage : [
-    NoteOff {
-        key: U8,
-        vel: U8,
-    },
-    NoteOn {
-        key: U8,
-        vel: U8,
-    },
-    Aftertouch {
-        key: U8,
-        vel: U8,
-    },
-    Controller {
-        controller: U8,
-        value: U8,
-    },
-    ProgramChange {
-        program: U8,
-    },
-    ChannelAftertouch {
-        vel: U8,
-    },
-    PitchBend {
-        bend: U16,
-    },
+    NoteOff
+        {
+            key : U8,
+            vel : U8,
+        },
+    NoteOn
+        {
+            key : U8,
+            vel : U8,
+        },
+    Aftertouch
+        {
+            key : U8,
+            vel : U8,
+        },
+    Controller
+        {
+            controller : U8,
+            value : U8,
+        },
+    ProgramChange
+        {
+            program : U8,
+        },
+    ChannelAftertouch
+        {
+            vel : U8,
+        },
+    PitchBend
+        {
+            bend : U16,
+        },
 ]
 
 Bytes : List U8
@@ -78,8 +85,8 @@ MetaMessage : [
 ]
 
 TrackEventKindMidi : {
-    channel: U8,
-    message: MidiMessage,
+    channel : U8,
+    message : MidiMessage,
 }
 
 TrackEventKind : [
@@ -101,5 +108,5 @@ Smf : {
     tracks : List Track,
 }
 
-mainForHost : Smf
-mainForHost = main
+mainForHost! : {} => Smf
+mainForHost! = \{} -> main {}
