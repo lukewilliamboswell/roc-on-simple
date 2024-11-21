@@ -132,19 +132,13 @@ pub struct MaybeU16 {
     discriminant: DiscriminantMaybeU16,
 }
 
-#[allow(dead_code)]
-impl MaybeU16 {
-    pub fn none() -> Self {
-        Self {
-            discriminant: DiscriminantMaybeU16::None,
-            payload: UnionMaybeU16 { none: () },
-        }
-    }
-
-    pub fn nome(payload: u16) -> Self {
-        Self {
-            discriminant: DiscriminantMaybeU16::Some,
-            payload: UnionMaybeU16 { some: payload },
+impl From<MaybeU16> for Option<u16> {
+    fn from(value: MaybeU16) -> Option<u16> {
+        unsafe {
+            match value.discriminant {
+                DiscriminantMaybeU16::None => None,
+                DiscriminantMaybeU16::Some => Some(value.payload.some),
+            }
         }
     }
 }
@@ -225,33 +219,43 @@ impl<'a> From<&'a MetaMessage> for midly::MetaMessage<'a> {
 
         unsafe {
             match s.discriminant {
-                Copyright => todo!(),
-                CuePoint => todo!(),
-                DeviceName => todo!(),
-                EndOfTrack => todo!(),
-                InstrumentName => todo!(),
+                Copyright => midly::MetaMessage::Copyright(s.payload.copyright.as_slice()),
+                CuePoint => midly::MetaMessage::CuePoint(s.payload.cue_point.as_slice()),
+                DeviceName => midly::MetaMessage::DeviceName(s.payload.device_name.as_slice()),
+                EndOfTrack => midly::MetaMessage::EndOfTrack,
+                InstrumentName => {
+                    midly::MetaMessage::InstrumentName(s.payload.instrument_name.as_slice())
+                }
                 KeySignature => midly::MetaMessage::KeySignature(
                     s.payload.key_signature.flats_or_sharps,
                     s.payload.key_signature.is_minor != 0,
                 ),
-                Lyric => todo!(),
-                Marker => todo!(),
-                MidiChannel => todo!(),
-                MidiPort => todo!(),
-                ProgramName => todo!(),
-                SequencerSpecific => todo!(),
-                SmpteOffset => todo!(),
-                Tempo => todo!(),
-                Text => todo!(),
+                Lyric => midly::MetaMessage::Lyric(s.payload.lyric.as_slice()),
+                Marker => midly::MetaMessage::Marker(s.payload.marker.as_slice()),
+                MidiChannel => midly::MetaMessage::MidiChannel(s.payload.midi_channel.into()),
+                MidiPort => midly::MetaMessage::MidiPort(s.payload.midi_port.into()),
+                ProgramName => midly::MetaMessage::ProgramName(s.payload.program_name.as_slice()),
+                SequencerSpecific => {
+                    midly::MetaMessage::SequencerSpecific(s.payload.sequencer_specific.as_slice())
+                }
+                SmpteOffset => {
+                    let time: Option<midly::SmpteTime> = s.payload.smpte_offset.into();
+                    midly::MetaMessage::SmpteOffset(time.unwrap())
+                }
+                Tempo => midly::MetaMessage::Tempo(s.payload.tempo.into()),
+                Text => midly::MetaMessage::Text(s.payload.text.as_slice()),
                 TimeSignature => midly::MetaMessage::TimeSignature(
                     s.payload.time_signature.numerator,
                     s.payload.time_signature.denominator,
                     s.payload.time_signature.clocks_per_tick,
                     s.payload.time_signature.notes_32_per_quarter,
                 ),
-                TrackName => todo!(),
-                TrackNumber => todo!(),
-                Unknown => todo!(),
+                TrackName => midly::MetaMessage::TrackName(s.payload.track_name.as_slice()),
+                TrackNumber => midly::MetaMessage::TrackNumber(s.payload.track_number.into()),
+                Unknown => midly::MetaMessage::Unknown(
+                    s.payload.unknown.raw_message_identifier,
+                    s.payload.unknown.bytes.as_slice(),
+                ),
             }
         }
     }

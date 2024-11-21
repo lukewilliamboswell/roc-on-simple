@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 mod roc;
 use roc_std::RocStr;
 use std::os::raw::c_void;
